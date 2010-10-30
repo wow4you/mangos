@@ -2590,6 +2590,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 28059:                                     // Positive Charge (Thaddius)
+                target->RemoveAurasDueToSpell(29659);
+                break;
+            case 28084:                                     // Negative Charge (Thaddius)
+                target->RemoveAurasDueToSpell(29660);
+                break;
             case 28169:                                     // Mutating Injection
             {
                 // Mutagen Explosion
