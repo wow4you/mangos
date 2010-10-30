@@ -1170,9 +1170,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     uint32 negativeChargedTargets = 0;
                     for (std::list<TargetInfo>::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); itr++)
                     {
-                        /*// Skip Non-Players
+                        // Skip Non-Players
                         if (!itr->targetGUID.IsPlayer())
-                            continue;*/
+                            continue;
 
                         // The order of the targets is not entirely random, hence add some randomness with urand(0, 1)
                         // apply positive, by random or if we have enough negative already
