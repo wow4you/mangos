@@ -2415,6 +2415,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
     // more generic checks
     if (spellInfo_1->SpellIconID == spellInfo_2->SpellIconID &&
             spellInfo_1->SpellIconID != 0 && spellInfo_2->SpellIconID != 0)
+            // esclude a few icons from this generic check
+            && spellInfo_1->SpellIconID != 1885 && spellInfo_1->SpellIconID != 1886)        // Thaddius Encounter, pos/neg Charge
     {
         bool isModifier = false;
         for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
