@@ -348,6 +348,15 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage += uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
+                    // Thaddius Charges
+                    case 28062:                             // Positive Charge
+                        if (unitTarget->HasAura(28059))
+                            damage = 0;
+                        break;
+                    case 28085:                             // Negative Charge
+                        if (unitTarget->HasAura(28084))
+                            damage = 0;
+                        break;
                     // percent max target health
                     case 29142:                             // Eyesore Blaster
                     case 35139:                             // Throw Boom's Doom
@@ -1180,6 +1189,45 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 23782, true);
                     m_caster->CastSpell(m_caster, 23783, true);
                     return;
+                case 28089:                                 // Polarity Shift (Thaddius)
+                {
+                    // First, we remove auras from previous casts (do this with aura stacking?), reapplying new auras on last-target
+                    unitTarget->RemoveAurasDueToSpell(28059);
+                    unitTarget->RemoveAurasDueToSpell(29659);
+                    unitTarget->RemoveAurasDueToSpell(28084);
+                    unitTarget->RemoveAurasDueToSpell(29660);
+
+                    if (m_UniqueTargetInfo.rbegin()->targetGUID != unitTarget->GetObjectGuid())
+                        return;
+
+                    // Keep Track of positive Charges
+                    uint32 maxPositiveTargets = m_UniqueTargetInfo.size() / 2;
+                    uint32 positiveChargedTargets = 0;
+                    uint32 negativeChargedTargets = 0;
+                    for (std::list<TargetInfo>::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); itr++)
+                    {
+                        /*// Skip Non-Players
+                        if (!itr->targetGUID.IsPlayer())
+                            continue;*/
+
+                        // The order of the targets is not entirely random, hence add some randomness with urand(0, 1)
+                        // apply positive, by random or if we have enough negative already
+                        if (Unit* pTarget = m_caster->GetMap()->GetUnit(itr->targetGUID))
+                        {
+                            if (positiveChargedTargets < maxPositiveTargets && (urand(0, 1) || negativeChargedTargets >= maxPositiveTargets))
+                            {
+                                pTarget->CastSpell(pTarget, 28059, true);
+                                positiveChargedTargets++;
+                            }
+                            else                            // apply negative
+                            {
+                                pTarget->CastSpell(pTarget, 28084, true);
+                                negativeChargedTargets++;
+                            }
+                        }
+                    }
+                    return;
+                }
                 case 24930:                                 // Hallow's End Treat
                 {
                     uint32 spell_id = 0;

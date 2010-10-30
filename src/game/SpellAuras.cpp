@@ -2154,6 +2154,24 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
+                    case 28059:                             // Thaddius Positive Charge
+                    case 28084:                             // Thaddius Negative Charge
+                    {
+                        // Apply to each nearby friend with same aura +1 of the stacking aura - TODO range= gueswork
+                        std::list<Unit*> friendsInRange;
+                        MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(target, 13.0f);
+                        MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(target, friendsInRange, u_check);
+                        Cell::VisitAllObjects(target, searcher, 13.0f);
+                        for (std::list<Unit*>::const_iterator itr = friendsInRange.begin(); itr != friendsInRange.end(); itr++)
+                        {
+                            if  ((*itr)->HasAura(GetId()) && (*itr) != target)
+                            {
+                                (*itr)->CastSpell(*itr, GetId() == 28059 ? 29659 : 29660, true);
+                                target->CastSpell(target, GetId() == 28059 ? 29659 : 29660, true, NULL, this);
+                            }
+                        }
+                        return;
+                    }
                     case 28832:                             // Mark of Korth'azz
                     case 28833:                             // Mark of Blaumeux
                     case 28834:                             // Mark of Rivendare
