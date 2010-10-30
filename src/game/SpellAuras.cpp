@@ -2100,7 +2100,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         // Apply to each nearby friend with same aura +1 of the stacking aura - TODO range= gueswork
                         std::list<Unit*> friendsInRange;
                         MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(target, 13.0f);
-                        MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(target, friendsInRange, u_check);
+                        MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(friendsInRange, u_check);
                         Cell::VisitAllObjects(target, searcher, 13.0f);
                         for (std::list<Unit*>::const_iterator itr = friendsInRange.begin(); itr != friendsInRange.end(); itr++)
                         {
