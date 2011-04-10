@@ -2096,7 +2096,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         return;
                     case 28059:                             // Thaddius Positive Charge
                     case 28084:                             // Thaddius Negative Charge
+                    case 39088:                             // Capacitus Positive Charge
+                    case 39091:                             // Capacitus Negative Charge
                     {
+                        uint32 uiBuffSpell = 0;
+                        switch (GetId())
+                        {
+                            case 28059: uiBuffSpell = 29659; break;
+                            case 28084: uiBuffSpell = 29660; break;
+                            case 39088: uiBuffSpell = 39089; break;
+                            case 39091: uiBuffSpell = 39092; break;
+                        }
+
                         // Apply to each nearby friend with same aura +1 of the stacking aura - TODO range= gueswork
                         std::list<Unit*> friendsInRange;
                         MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(target, 13.0f);
@@ -2106,8 +2117,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         {
                             if  ((*itr)->HasAura(GetId()) && (*itr) != target)
                             {
-                                (*itr)->CastSpell(*itr, GetId() == 28059 ? 29659 : 29660, true);
-                                target->CastSpell(target, GetId() == 28059 ? 29659 : 29660, true, NULL, this);
+                                (*itr)->CastSpell(*itr, uiBuffSpell, true);
+                                target->CastSpell(target, uiBuffSpell, true, NULL, this);
                             }
                         }
                         return;
