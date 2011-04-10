@@ -349,10 +349,10 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         break;
                     }
                     // Polarity Shift Charges
-                    case 28062:                             // Thaddius - Positive Charge
-                    case 28085:                             // Thaddius - Negative Charge
-                    case 39090:                             // Capacitus - Positive Charge
-                    case 39093:                             // Capacitus - Negative Charge
+                    case 28062:                             // Positive Charge (Thaddius)
+                    case 28085:                             // Negative Charge (Thaddius)
+                    case 39090:                             // Positive Charge (Capacitus)
+                    case 39093:                             // Negative Charge (Capacitus)
                     {
                         uint32 uiAuraId = 0;
                         switch (m_spellInfo->Id)

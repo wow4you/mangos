@@ -2094,10 +2094,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
-                    case 28059:                             // Thaddius Positive Charge
-                    case 28084:                             // Thaddius Negative Charge
-                    case 39088:                             // Capacitus Positive Charge
-                    case 39091:                             // Capacitus Negative Charge
+                    case 28059:                             // Positive Charge (Thaddius)
+                    case 28084:                             // Negative Charge (Thaddius)
+                    case 39088:                             // Positive Charge (Capacitus)
+                    case 39091:                             // Negative Charge (Capacitus)
                     {
                         uint32 uiBuffSpell = 0;
                         switch (GetId())
