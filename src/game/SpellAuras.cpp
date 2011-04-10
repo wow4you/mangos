@@ -2602,11 +2602,22 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 return;
             }
             case 28059:                                     // Positive Charge (Thaddius)
-                target->RemoveAurasDueToSpell(29659);
-                break;
             case 28084:                                     // Negative Charge (Thaddius)
-                target->RemoveAurasDueToSpell(29660);
+            case 39088:                                     // Positive Charge (Capacitus)
+            case 39091:                                     // Negative Charge (Capacitus)
+            {
+                uint32 uiBuffAura = 0;
+                switch (GetId())
+                {
+                    case 28059: uiBuffAura = 29659; break;
+                    case 28084: uiBuffAura = 29660; break;
+                    case 39088: uiBuffAura = 39089; break;
+                    case 39091: uiBuffAura = 39092; break;
+                }
+
+                target->RemoveAurasDueToSpell(uiBuffAura);
                 break;
+            }
             case 28169:                                     // Mutating Injection
             {
                 // Mutagen Explosion
