@@ -348,15 +348,22 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage += uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
-                    // Thaddius Charges
-                    case 28062:                             // Positive Charge
-                        if (unitTarget->HasAura(28059))
+                    // Polarity Shift Charges
+                    case 28062:                             // Thaddius - Positive Charge
+                    case 28085:                             // Thaddius - Negative Charge
+                    {
+                        uint32 uiAuraId = 0;
+                        switch (m_spellInfo->Id)
+                        {
+                            case 28062: uiAuraId = 28059; break;
+                            case 28085: uiAuraId = 28084; break;
+                        }
+
+                        // Do not damage non-players or players with same aura
+                        if (unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->HasAura(uiAuraId))
                             damage = 0;
                         break;
-                    case 28085:                             // Negative Charge
-                        if (unitTarget->HasAura(28084))
-                            damage = 0;
-                        break;
+                    }
                     // percent max target health
                     case 29142:                             // Eyesore Blaster
                     case 35139:                             // Throw Boom's Doom
