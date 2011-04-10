@@ -351,12 +351,16 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     // Polarity Shift Charges
                     case 28062:                             // Thaddius - Positive Charge
                     case 28085:                             // Thaddius - Negative Charge
+                    case 39090:                             // Capacitus - Positive Charge
+                    case 39093:                             // Capacitus - Negative Charge
                     {
                         uint32 uiAuraId = 0;
                         switch (m_spellInfo->Id)
                         {
                             case 28062: uiAuraId = 28059; break;
                             case 28085: uiAuraId = 28084; break;
+                            case 39090: uiAuraId = 39088; break;
+                            case 39093: uiAuraId = 39091; break;
                         }
 
                         // Do not damage non-players or players with same aura
