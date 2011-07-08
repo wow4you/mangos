@@ -1981,6 +1981,22 @@ void Aura::TriggerSpell()
                 triggerTarget->CastCustomSpell(triggerTarget, trigger_spell_id, &m_modifier.m_amount, NULL, NULL, true, NULL, this);
                 return;
             }
+            case 28059:                                     // Positive Charge (Thaddius)
+            case 28084:                                     // Negative Charge (Thaddius)
+            case 39088:                                     // Positive Charge (Capacitus)
+            case 39091:                                     // Negative Charge (Capacitus)
+            {
+                uint32 buffId = 0;
+                switch(auraId)
+                {
+                    case 28059: buffId = 29659; break;
+                    case 28084: buffId = 29660; break;
+                    case 39088: buffId = 39089; break;
+                    case 39091: buffId = 39092; break;
+                }
+                target->RemoveAurasDueToSpell(buffId);
+                break;
+            }
             case 33525:                                     // Ground Slam
                 triggerTarget->CastSpell(triggerTarget, trigger_spell_id, true, NULL, this, casterGUID);
                 return;
@@ -2094,35 +2110,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (Unit* caster = GetCaster())
                             caster->CastSpell(caster, 13138, true, NULL, this);
                         return;
-                    case 28059:                             // Positive Charge (Thaddius)
-                    case 28084:                             // Negative Charge (Thaddius)
-                    case 39088:                             // Positive Charge (Capacitus)
-                    case 39091:                             // Negative Charge (Capacitus)
-                    {
-                        uint32 uiBuffSpell = 0;
-                        switch (GetId())
-                        {
-                            case 28059: uiBuffSpell = 29659; break;
-                            case 28084: uiBuffSpell = 29660; break;
-                            case 39088: uiBuffSpell = 39089; break;
-                            case 39091: uiBuffSpell = 39092; break;
-                        }
-
-                        // Apply to each nearby friend with same aura +1 of the stacking aura - TODO range= gueswork
-                        std::list<Unit*> friendsInRange;
-                        MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(target, 13.0f);
-                        MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(friendsInRange, u_check);
-                        Cell::VisitAllObjects(target, searcher, 13.0f);
-                        for (std::list<Unit*>::const_iterator itr = friendsInRange.begin(); itr != friendsInRange.end(); itr++)
-                        {
-                            if  ((*itr)->HasAura(GetId()) && (*itr) != target)
-                            {
-                                (*itr)->CastSpell(*itr, uiBuffSpell, true);
-                                target->CastSpell(target, uiBuffSpell, true, NULL, this);
-                            }
-                        }
-                        return;
-                    }
                     case 28832:                             // Mark of Korth'azz
                     case 28833:                             // Mark of Blaumeux
                     case 28834:                             // Mark of Rivendare
@@ -2533,16 +2520,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             case 39088:                                     // Positive Charge (Capacitus)
             case 39091:                                     // Negative Charge (Capacitus)
             {
-                uint32 uiBuffAura = 0;
+                uint32 buffAura = 0;
                 switch (GetId())
                 {
-                    case 28059: uiBuffAura = 29659; break;
-                    case 28084: uiBuffAura = 29660; break;
-                    case 39088: uiBuffAura = 39089; break;
-                    case 39091: uiBuffAura = 39092; break;
+                    case 28059: buffAura = 29659; break;
+                    case 28084: buffAura = 29660; break;
+                    case 39088: buffAura = 39089; break;
+                    case 39091: buffAura = 39092; break;
                 }
 
-                target->RemoveAurasDueToSpell(uiBuffAura);
+                target->RemoveAurasDueToSpell(buffAura);
                 break;
             }
             case 28169:                                     // Mutating Injection
