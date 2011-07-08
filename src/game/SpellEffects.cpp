@@ -355,17 +355,27 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     case 39093:                             // Negative Charge (Capacitus)
                     {
                         uint32 uiAuraId = 0;
+                        uint32 uiBuffId = 0;
                         switch (m_spellInfo->Id)
                         {
-                            case 28062: uiAuraId = 28059; break;
-                            case 28085: uiAuraId = 28084; break;
-                            case 39090: uiAuraId = 39088; break;
-                            case 39093: uiAuraId = 39091; break;
+                            case 28062: uiAuraId = 28059; uiBuffId = 29659; break;
+                            case 28085: uiAuraId = 28084; uiBuffId = 29660; break;
+                            case 39090: uiAuraId = 39088; uiBuffId = 39089; break;
+                            case 39093: uiAuraId = 39091; uiBuffId = 39092; break;
                         }
 
                         // Do not damage non-players or players with same aura
-                        if (unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->HasAura(uiAuraId))
+                        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                             damage = 0;
+
+                        if (unitTarget != m_caster && unitTarget->HasAura(uiAuraId))
+                        {
+                            // Buff ourself
+                            // TODO - Actually the caster should send one SPELL_START msg
+                            m_caster->CastSpell(m_caster, uiBuffId, true);
+                            // Don't deal damage
+                            damage = 0;
+                        }
                         break;
                     }
                     // percent max target health
@@ -1203,30 +1213,23 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 28089:                                 // Polarity Shift (Thaddius)
                 case 39096:                                 // Polarity Shift (Mechano-Lord Capacitus)
                 {
-                    uint32 uiPositiveDummyAura = 0;
-                    uint32 uiNegativeDummyAura = 0;
+                    uint32 positiveDummyAura = 0;
+                    uint32 negativeDummyAura = 0;
 
                     // First, we remove auras from previous casts, reapplying new auras on last-target
                     if (m_spellInfo->Id == 28089)
                     {
-                        unitTarget->RemoveAurasDueToSpell(28059);
-                        unitTarget->RemoveAurasDueToSpell(29659);
-                        unitTarget->RemoveAurasDueToSpell(28084);
-                        unitTarget->RemoveAurasDueToSpell(29660);
-
-                        uiPositiveDummyAura = 28059;
-                        uiNegativeDummyAura = 28084;
+                        positiveDummyAura = 28059;
+                        negativeDummyAura = 28084;
                     }
                     else if (m_spellInfo->Id == 39096)
                     {
-                        unitTarget->RemoveAurasDueToSpell(39088);
-                        unitTarget->RemoveAurasDueToSpell(39089);
-                        unitTarget->RemoveAurasDueToSpell(39091);
-                        unitTarget->RemoveAurasDueToSpell(39092);
-
-                        uiPositiveDummyAura = 39088;
-                        uiNegativeDummyAura = 39091;
+                        positiveDummyAura = 39088;
+                        negativeDummyAura = 39091;
                     }
+
+                    unitTarget->RemoveAurasDueToSpell(positiveDummyAura);
+                    unitTarget->RemoveAurasDueToSpell(negativeDummyAura);
 
                     if (m_UniqueTargetInfo.rbegin()->targetGUID != unitTarget->GetObjectGuid())
                         return;
@@ -1247,12 +1250,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         {
                             if (positiveChargedTargets < maxPositiveTargets && (urand(0, 1) || negativeChargedTargets >= maxPositiveTargets))
                             {
-                                pTarget->CastSpell(pTarget, uiPositiveDummyAura, true);
+                                pTarget->CastSpell(pTarget, positiveDummyAura, true);
                                 positiveChargedTargets++;
                             }
                             else                            // apply negative
                             {
-                                pTarget->CastSpell(pTarget, uiNegativeDummyAura, true);
+                                pTarget->CastSpell(pTarget, negativeDummyAura, true);
                                 negativeChargedTargets++;
                             }
                         }
