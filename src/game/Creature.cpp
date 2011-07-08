@@ -1771,7 +1771,9 @@ void Creature::CallAssistance()
     {
         SetNoCallAssistance(true);
 
-        float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS);
+        // Radius depending on rank
+        float radius = (GetCreatureInfo()->rank / 2 + 1) * sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_ASSISTANCE_RADIUS);
+
         if (radius > 0)
         {
             std::list<Creature*> assistList;
@@ -1887,7 +1889,8 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
         return false;
 
     float AttackDist = GetAttackDistance(pVictim);
-    float ThreatRadius = sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS);
+    // rank dependend
+    float ThreatRadius = (GetCreatureInfo()->rank / 2 + 1) * sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS);
 
     //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
     return !pVictim->IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ,
