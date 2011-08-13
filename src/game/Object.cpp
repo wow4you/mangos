@@ -563,7 +563,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                                             && (target->IsInSameGroupWith((Player*)cme->GetOwner()) || target->IsInSameRaidWith((Player*)cme->GetOwner()));
                         }
 
-                        if (((Unit*)this)->IsSpoofSamePlayerFaction() || forcefriendly || (target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && (target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))))
+                        if (forcefriendly || (target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && (target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))))
                         {
                             if (index == UNIT_FIELD_BYTES_2)
                             {
@@ -577,7 +577,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                                 ft1 = ((Unit*)this)->getFactionTemplateEntry();
                                 ft2 = ((Unit*)target)->getFactionTemplateEntry();
 
-                                if (ft1 && ft2 && (!ft1->IsFriendlyTo(*ft2) || ((Unit*)this)->IsSpoofSamePlayerFaction()))
+                                if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2))
                                 {
                                     // pretend that all other HOSTILE units in group have own faction, to allow follow, heal, rezz (trade wont work)
                                     uint32 faction = ((Player*)target)->getFaction();
