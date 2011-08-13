@@ -267,6 +267,8 @@ Unit::Unit() :
 
     m_isCreatureLinkingTrigger = false;
     m_isSpawningLinked = false;
+
+    m_spoofSamePlayerFaction = false;
 }
 
 Unit::~Unit()

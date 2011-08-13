@@ -1899,6 +1899,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void AddPetAura(PetAura const* petSpell);
         void RemovePetAura(PetAura const* petSpell);
 
+        inline void SetSpoofSamePlayerFaction(bool b) { m_spoofSamePlayerFaction = b; }
+        inline bool IsSpoofSamePlayerFaction(void) {return m_spoofSamePlayerFaction; }
+
         // Movement info
         MovementInfo m_movementInfo;
         Movement::MoveSpline* movespline;
@@ -1961,9 +1964,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_lastManaUseTimer;
 
         VehicleInfo* m_vehicleInfo;
+
         void DisableSpline();
         bool m_isCreatureLinkingTrigger;
         bool m_isSpawningLinked;
+
+
+        bool m_spoofSamePlayerFaction : 1;
 
     private:
         void CleanupDeletedAuras();
