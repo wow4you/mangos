@@ -264,6 +264,11 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                 player->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
         }
 
+        if (unit->GetTransport() || unit->GetVehicle())
+            unit->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
+        else
+            unit->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
+
         // Update movement info time
         unit->m_movementInfo.UpdateTime(WorldTimer::getMSTime());
         // Write movement info

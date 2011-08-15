@@ -54,6 +54,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NOT_TAUNTABLE   = 0x00000100,       // creature is immune to taunt auras and effect attack me
     CREATURE_FLAG_EXTRA_AGGRO_ZONE      = 0x00000200,       // creature sets itself in combat with zone on aggro
     CREATURE_FLAG_EXTRA_GUARD           = 0x00000400,       // creature is a guard
+    CREATURE_FLAG_EXTRA_KEEP_AI         = 0x00001000,       // creature keeps ScriptedAI even after being charmed / controlled (instead of getting PetAI)
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -81,6 +82,7 @@ struct CreatureInfo
     uint32  maxlevel;
     uint32  minhealth;
     uint32  maxhealth;
+    uint32  powerType;
     uint32  minmana;
     uint32  maxmana;
     uint32  armor;
@@ -128,7 +130,7 @@ struct CreatureInfo
     uint32  MovementType;
     uint32  InhabitType;
     float   unk16;
-    float   unk17;
+    float   power_mod;
     bool    RacialLeader;
     uint32  questItems[6];
     uint32  movementId;
@@ -713,7 +715,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         float m_respawnradius;
 
         CreatureSubtype m_subtype;                          // set in Creatures subclasses for fast it detect without dynamic_cast use
-        void RegenerateMana();
+        void Regenerate(Powers power);
         void RegenerateHealth();
         MovementGeneratorType m_defaultMovementType;
         Cell m_currentCell;                                 // store current cell where creature listed
