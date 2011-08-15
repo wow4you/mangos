@@ -633,22 +633,23 @@ void Creature::RegenerateAll(uint32 update_diff)
     if (!isInCombat() || IsPolymorphed())
         RegenerateHealth();
 
-    Regenerate(getPowerType());
+    RegeneratePower();
 
     m_regenTimer = REGEN_TIME_FULL;
 }
 
-void Creature::Regenerate(Powers power)
+void Creature::RegeneratePower()
 {
-    uint32 curValue = GetPower(power);
-    uint32 maxValue = GetMaxPower(power);
+    Powers powerType = getPowerType();
+    uint32 curValue = GetPower(powerType);
+    uint32 maxValue = GetMaxPower(powerType);
 
     if (curValue >= maxValue)
         return;
 
     float addvalue = 0.0f;
 
-    switch(power)
+    switch (powerType)
     {
         case POWER_MANA:
         {
@@ -700,15 +701,15 @@ void Creature::Regenerate(Powers power)
 
     AuraList const& ModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
     for(AuraList::const_iterator i = ModPowerRegenAuras.begin(); i != ModPowerRegenAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == power)
+        if ((*i)->GetModifier()->m_miscvalue == powerType)
             addvalue += (*i)->GetModifier()->m_amount;
 
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == power)
+        if ((*i)->GetModifier()->m_miscvalue == powerType)
             addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
 
-    ModifyPower(power, int32(addvalue));
+    ModifyPower(powerType, int32(addvalue));
 }
 
 void Creature::RegenerateHealth()
