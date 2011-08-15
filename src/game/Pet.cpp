@@ -271,16 +271,18 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         LearnPetPassives();
         CastPetAuras(current);
     }
+    
+    Powers powerType = getPowerType();
 
     if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
-        SetPower(getPowerType(), GetMaxPower(getPowerType()));
+        SetPower(powerType, GetMaxPower(powerType));
     }
     else
     {
         SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-        SetPower(getPowerType(), savedmana > GetMaxPower(getPowerType()) ? GetMaxPower(getPowerType()) : savedmana);
+        SetPower(powerType, savedmana > GetMaxPower(powerType) ? GetMaxPower(powerType) : savedmana);
     }
 
     AIM_Initialize();
@@ -569,20 +571,10 @@ void Pet::RegenerateAll(uint32 update_diff)
     //regenerate focus for hunter pets or energy for deathknight's ghoul
     if (m_regenTimer <= update_diff)
     {
-        switch (getPowerType())
-        {
-            case POWER_FOCUS:
-            case POWER_ENERGY:
-                Regenerate(getPowerType());
-                break;
-            default:
-                break;
-        }
-
         if (!isInCombat() || IsPolymorphed())
             RegenerateHealth();
 
-        Regenerate(getPowerType());
+        RegeneratePower();
 
         m_regenTimer = 4000;
     }
@@ -599,44 +591,6 @@ void Pet::RegenerateAll(uint32 update_diff)
     }
     else
         m_happinessTimer -= update_diff;
-}
-
-
-void Pet::Regenerate(Powers power)
-{
-    uint32 curValue = GetPower(power);
-    uint32 maxValue = GetMaxPower(power);
-
-    if (curValue >= maxValue)
-        return;
-
-    float addvalue = 0.0f;
-
-    switch (power)
-    {
-        case POWER_FOCUS:
-        {
-            // For hunter pets.
-            addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
-            break;
-        }
-        case POWER_ENERGY:
-        {
-            // For deathknight's ghoul.
-            addvalue = 20;
-            break;
-        }
-        default:
-            return;
-    }
-
-    // Apply modifiers (if any).
-    AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for (AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == int32(power))
-            addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
-
-    ModifyPower(power, (int32)addvalue);
 }
 
 void Pet::LooseHappiness()
