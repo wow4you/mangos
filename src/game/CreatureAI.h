@@ -216,6 +216,9 @@ class MANGOS_DLL_SPEC CreatureAI
          */
         virtual void ReceiveEmote(Player* /*pPlayer*/, uint32 /*uiEmote*/) {}
 
+        // Called at vehicle enter
+        virtual void PassengerBoarded(Unit * /*who*/, int8 /*seatId*/, bool /*apply*/) {}
+
         ///== Triggered Actions Requested ==================
 
         /**

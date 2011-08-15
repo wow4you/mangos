@@ -275,12 +275,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(getPowerType(), GetMaxPower(getPowerType()));
     }
     else
     {
         SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-        SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+        SetPower(getPowerType(), savedmana > GetMaxPower(getPowerType()) ? GetMaxPower(getPowerType()) : savedmana);
     }
 
     AIM_Initialize();
@@ -582,7 +582,7 @@ void Pet::RegenerateAll(uint32 update_diff)
         if (!isInCombat() || IsPolymorphed())
             RegenerateHealth();
 
-        RegenerateMana();
+        Regenerate(getPowerType());
 
         m_regenTimer = 4000;
     }
@@ -1093,7 +1093,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     UpdateAllStats();
 
     SetHealth(GetMaxHealth());
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    SetPower(getPowerType(), GetMaxPower(getPowerType()));
 
     return true;
 }

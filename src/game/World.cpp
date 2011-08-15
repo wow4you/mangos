@@ -65,6 +65,7 @@
 #include "AuctionHouseBot/AuctionHouseBot.h"
 #include "CharacterDatabaseCleaner.h"
 #include "CreatureLinkingMgr.h"
+#include "Vehicle.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -1077,6 +1078,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadCreatureAddons();                        // must be after LoadCreatureTemplates() and LoadCreatures()
     sLog.outString(">>> Creature Addon Data loaded");
     sLog.outString();
+
+    sLog.outString("Loading Vehicle Accessories...");
+    sObjectMgr.LoadVehicleAccessories();
 
     sLog.outString("Loading Gameobject Data...");
     sObjectMgr.LoadGameObjects();

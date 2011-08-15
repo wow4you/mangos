@@ -393,6 +393,7 @@ class Spell
         void setState(uint32 state) { m_spellState = state; }
 
         void DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype);
+        void DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction = 0);
 
         void WriteSpellGoTargets(WorldPacket* data);
         void WriteAmmoToPacket(WorldPacket* data);

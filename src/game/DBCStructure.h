@@ -1962,7 +1962,7 @@ struct VehicleEntry
     uint32  m_uiLocomotionType;                             // 34
     float   m_msslTrgtImpactTexRadius;                      // 35
     uint32  m_uiSeatIndicatorType;                          // 36       m_vehicleUIIndicatorID
-    // 37       m_powerDisplayID
+    uint32  m_powerType;                                    // 37       m_powerDisplayID
     // 38 new in 3.1
     // 39 new in 3.1
 };
@@ -2027,6 +2027,8 @@ struct VehicleSeatEntry
     // 55       m_cameraEnteringZoom"
     // 56       m_cameraSeatZoomMin
     // 57       m_cameraSeatZoomMax
+
+    bool IsUsable() const { return m_flags & SEAT_FLAG_USABLE; }
 };
 
 struct WMOAreaTableEntry

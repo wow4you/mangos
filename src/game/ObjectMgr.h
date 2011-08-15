@@ -36,6 +36,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Policies/Singleton.h"
+#include "Vehicle.h"
 
 #include <string>
 #include <map>
@@ -629,6 +630,15 @@ class ObjectMgr
         static CreatureModelInfo const* GetCreatureModelInfo(uint32 modelid);       ///< Wrapper for sCreatureModelStorage.LookupEntry
         static EquipmentInfo const* GetEquipmentInfo(uint32 entry);                 ///< Wrapper for sEquipmentStorage.LookupEntry
         static CreatureDataAddon const* GetCreatureAddon(uint32 lowguid);           ///< Wrapper for sCreatureDataAddonStorage.LookupEntry
+
+        VehicleAccessoryList const* GetVehicleAccessoryList(uint32 uiEntry) const
+        {
+            VehicleAccessoryMap::const_iterator itr = m_VehicleAccessoryMap.find(uiEntry);
+            if (itr != m_VehicleAccessoryMap.end())
+                return &itr->second;
+            return NULL;
+        }
+
         static CreatureDataAddon const* GetCreatureTemplateAddon(uint32 entry);     ///< Wrapper for sCreatureInfoAddonStorage.LookupEntry
         static ItemPrototype const* GetItemPrototype(uint32 id);                    ///< Wrapper for sItemStorage.LookupEntry
         static InstanceTemplate const* GetInstanceTemplate(uint32 map);             ///< Wrapper for sInstanceTemplate.LookupEntry
@@ -716,6 +726,8 @@ class ObjectMgr
         void LoadVendors() { LoadVendors("npc_vendor", false); }
         void LoadTrainerTemplates();
         void LoadTrainers() { LoadTrainers("npc_trainer", false); }
+
+        void LoadVehicleAccessories();
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level) const;
@@ -1145,6 +1157,8 @@ class ObjectMgr
         ItemConvertMap        m_ItemConvert;
         ItemConvertMap        m_ItemExpireConvert;
         ItemRequiredTargetMap m_ItemRequiredTarget;
+
+        VehicleAccessoryMap m_VehicleAccessoryMap;
 
         typedef             std::vector<LocaleConstant> LocalForIndex;
         LocalForIndex        m_LocalForIndex;
