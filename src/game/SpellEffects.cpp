@@ -7895,6 +7895,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 51864, true);
                     return;
                 }
+                case 51904:                                 // Summon Ghouls On Scarlet Crusade
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // cast Summon Ghouls On Scarlet Crusade
+                    unitTarget->CastSpell(unitTarget, 54522, true);
+                    return;
+                }
                 case 51910:                                 // Kickin' Nass: Quest Completion
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -7906,6 +7915,16 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         if (Pet* pPet = m_caster->FindGuardianWithEntry(pSpell->EffectMiscValue[EFFECT_INDEX_0]))
                             pPet->Unsummon(PET_SAVE_AS_DELETED, m_caster);
                     }
+                    return;
+                }
+                case 52694:                                 // Recall Eye of Acherus
+                {
+                    if (!m_caster || m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // remove charm effect
+                    m_caster->RemoveAurasDueToSpell(530);
+                    m_caster->AddObjectToRemoveList();
                     return;
                 }
                 case 52751:                                 // Death Gate

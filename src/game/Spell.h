@@ -394,6 +394,7 @@ class Spell
 
         void DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype);
         void DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction = 0);
+        void DoSummonPossessed(SpellEffectIndex eff_idx);
 
         void WriteSpellGoTargets(WorldPacket* data);
         void WriteAmmoToPacket(WorldPacket* data);
