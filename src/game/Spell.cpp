@@ -5772,29 +5772,48 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             }
             else
             {
+                bool duelvsplayertar = false;
                 bool dualEffect = false;
                 for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
                 {
                                                             // This effects is positive AND negative. Need for vehicles cast.
-                    dualEffect |= (m_spellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_IN_FRONT_OF_CASTER_30
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_MASTER
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_IN_FRONT_OF_CASTER
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_EFFECT_SELECT
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE
-                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES);
+                    if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER)
+                    {
+                        duelvsplayertar = true;
+                        dualEffect = true;
+                        break;
+                    }
+                    if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_IN_FRONT_OF_CASTER_30
+                        || m_spellInfo->EffectImplicitTargetA[j] == TARGET_MASTER
+                        || m_spellInfo->EffectImplicitTargetA[j] == TARGET_IN_FRONT_OF_CASTER
+                        || m_spellInfo->EffectImplicitTargetA[j] == TARGET_EFFECT_SELECT
+                        || m_spellInfo->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE
+                        || m_spellInfo->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES)
+                    {
+                        dualEffect = true;
+                        break;
+                    }
                 }
-                if (m_caster->IsFriendlyTo(_target) && !(!m_caster->GetCharmerOrOwner() || !m_caster->GetCharmerOrOwner()->IsFriendlyTo(_target))
-                     && !dualEffect && !IsDispelSpell(m_spellInfo) && !m_caster->GetVehicleKit())
+                // Special treatment for vehicles, understand someone this crappy vehicle patch..
+                if (m_caster->GetObjectGuid().IsVehicle())
                 {
-                    DEBUG_LOG("Charmed creature attempt to cast spell %d, but target (guid %u) is not valid",m_spellInfo->Id,_target->GetObjectGuid().GetRawValue());
-                    return SPELL_FAILED_BAD_TARGETS;
-                }
+                    if (m_caster->IsFriendlyTo(_target) && !(!m_caster->GetCharmerOrOwner() || !m_caster->GetCharmerOrOwner()->IsFriendlyTo(_target))
+                         && !dualEffect && !IsDispelSpell(m_spellInfo) && !m_caster->GetVehicleKit())
+                    {
+                        DEBUG_LOG("Charmed creature attempt to cast spell %d, but target (guid %u) is not valid",m_spellInfo->Id,_target->GetObjectGuid().GetRawValue());
+                        return SPELL_FAILED_BAD_TARGETS;
+                    }
 
-                if (m_caster->GetObjectGuid() == _target->GetObjectGuid() && dualEffect && !IsPositiveSpell(m_spellInfo->Id))
+                    if (m_caster->GetObjectGuid() == _target->GetObjectGuid() && dualEffect && !IsPositiveSpell(m_spellInfo->Id))
+                    {
+                        DEBUG_LOG("Charmed creature %u attempt to cast negative spell %d on self",_target->GetObjectGuid().GetRawValue(),m_spellInfo->Id);
+//                        return SPELL_FAILED_BAD_TARGETS;
+                    }
+                }
+                else    // Normal Case
                 {
-                    DEBUG_LOG("Charmed creature %u attempt to cast negative spell %d on self",_target->GetObjectGuid().GetRawValue(),m_spellInfo->Id);
-//                    return SPELL_FAILED_BAD_TARGETS;
+                    if (!duelvsplayertar && m_caster->IsFriendlyTo(target))
+                        return SPELL_FAILED_BAD_TARGETS;
                 }
             }
         }
