@@ -10674,7 +10674,7 @@ bool Unit::SetPosition(float x, float y, float z, float orientation, bool telepo
     return relocate || turn;
 }
 
-void Unit::MonsterMoveTransport(WorldObject *transport, SplineType type, SplineFlags flags, uint32 moveTime, ...)
+void Unit::MonsterMoveTransport(WorldObject *transport, uint32 type, uint32 flags, uint32 moveTime, ...)
 {
     va_list vargs;
     va_start(vargs, moveTime);
@@ -10693,21 +10693,21 @@ void Unit::MonsterMoveTransport(WorldObject *transport, SplineType type, SplineF
 
     switch(type)
     {
-        case SPLINETYPE_NORMAL:                             // normal packet
+        case 0/*SPLINETYPE_NORMAL*/:                             // normal packet
             break;
-        case SPLINETYPE_STOP:                               // stop packet (raw pos?)
+        case 1/*SPLINETYPE_STOP*/:                               // stop packet (raw pos?)
             va_end(vargs);
             SendMessageToSet(&data, true);
             return;
-        case SPLINETYPE_FACINGSPOT:                         // facing spot
+        case 2/*SPLINETYPE_FACINGSPOT*/:                         // facing spot
             data << float(va_arg(vargs,double));
             data << float(va_arg(vargs,double));
             data << float(va_arg(vargs,double));
             break;
-        case SPLINETYPE_FACINGTARGET:
+        case 3/*SPLINETYPE_FACINGTARGET*/:
             data << uint64(va_arg(vargs,uint64));
             break;
-        case SPLINETYPE_FACINGANGLE:
+        case 4/*SPLINETYPE_FACINGANGLE*/:
             data << float(va_arg(vargs,double));            // facing angle
             break;
     }
