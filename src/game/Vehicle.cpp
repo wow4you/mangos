@@ -229,7 +229,7 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
         }
     }
 
-    passenger->MonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
+    passenger->MonsterMoveTransport(m_pBase, 4/*SPLINETYPE_FACINGANGLE*/, 0x00800000/*SPLINEFLAG_UNKNOWN5*/, 0, 0.0f);
 
     RelocatePassengers(m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ()+0.5f, m_pBase->GetOrientation());
 
