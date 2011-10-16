@@ -814,12 +814,6 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
             const_cast<CreatureDataAddon*>(addon)->emote = 0;
         }
 
-        if (addon->splineFlags & (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3))
-        {
-            sLog.outErrorDb("Creature (%s %u) spline flags mask defined in `%s` include forbidden flags (" I32FMT ") that can crash client, cleanup at load.", entryName, addon->guidOrEntry, creatureaddons.GetTableName(), (SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3));
-            const_cast<CreatureDataAddon*>(addon)->splineFlags &= ~(SPLINEFLAG_TRAJECTORY|SPLINEFLAG_UNKNOWN3);
-        }
-
         ConvertCreatureAddonAuras(const_cast<CreatureDataAddon*>(addon), creatureaddons.GetTableName(), entryName);
     }
 }
@@ -1509,7 +1503,7 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if(!gInfo->displayId)
+        if (!gInfo->displayId)
         {
             switch(gInfo->type)
             {
@@ -1536,14 +1530,21 @@ void ObjectMgr::LoadGameobjects()
         data.posY           = fields[ 4].GetFloat();
         data.posZ           = fields[ 5].GetFloat();
         data.orientation    = fields[ 6].GetFloat();
-        data.rotation0      = fields[ 7].GetFloat();
-        data.rotation1      = fields[ 8].GetFloat();
-        data.rotation2      = fields[ 9].GetFloat();
-        data.rotation3      = fields[10].GetFloat();
+        data.rotation.x     = fields[ 7].GetFloat();
+        data.rotation.y     = fields[ 8].GetFloat();
+        data.rotation.z     = fields[ 9].GetFloat();
+        data.rotation.w     = fields[10].GetFloat();
         data.spawntimesecs  = fields[11].GetInt32();
+        data.animprogress   = fields[12].GetUInt32();
+        uint32 go_state     = fields[13].GetUInt32();
+        data.spawnMask      = fields[14].GetUInt8();
+        data.phaseMask      = fields[15].GetUInt16();
+        int16 gameEvent     = fields[16].GetInt16();
+        int16 GuidPoolId    = fields[17].GetInt16();
+        int16 EntryPoolId   = fields[18].GetInt16();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
-        if(!mapEntry)
+        if (!mapEntry)
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) that spawned at nonexistent map (Id: %u), skip", guid, data.id, data.mapid);
             continue;
@@ -1557,9 +1558,6 @@ void ObjectMgr::LoadGameobjects()
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with `spawntimesecs` (0) value, but gameobejct marked as despawnable at action.", guid, data.id);
         }
 
-        data.animprogress   = fields[12].GetUInt32();
-
-        uint32 go_state     = fields[13].GetUInt32();
         if (go_state >= MAX_GO_STATE)
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid `state` (%u) value, skip", guid, data.id, go_state);
@@ -1567,43 +1565,37 @@ void ObjectMgr::LoadGameobjects()
         }
         data.go_state       = GOState(go_state);
 
-        data.spawnMask      = fields[14].GetUInt8();
-        data.phaseMask      = fields[15].GetUInt16();
-        int16 gameEvent     = fields[16].GetInt16();
-        int16 GuidPoolId    = fields[17].GetInt16();
-        int16 EntryPoolId   = fields[18].GetInt16();
-
-        if (data.rotation0 < -1.0f || data.rotation0 > 1.0f)
+        if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
         {
-            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation0 (%f) value, skip", guid, data.id, data.rotation0);
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation.x (%f) value, skip", guid, data.id, data.rotation.x);
             continue;
         }
 
-        if (data.rotation1 < -1.0f || data.rotation1 > 1.0f)
+        if (data.rotation.y < -1.0f || data.rotation.y > 1.0f)
         {
-            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation1 (%f) value, skip", guid, data.id, data.rotation1);
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation.y (%f) value, skip", guid, data.id, data.rotation.y);
             continue;
         }
 
-        if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
+        if (data.rotation.z < -1.0f || data.rotation.z > 1.0f)
         {
-            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation2 (%f) value, skip", guid, data.id, data.rotation2);
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation.z (%f) value, skip", guid, data.id, data.rotation.z);
             continue;
         }
 
-        if (data.rotation3 < -1.0f || data.rotation3 > 1.0f)
+        if (data.rotation.w < -1.0f || data.rotation.w > 1.0f)
         {
-            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation3 (%f) value, skip", guid, data.id, data.rotation3);
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid rotation.w (%f) value, skip", guid, data.id, data.rotation.w);
             continue;
         }
 
-        if(!MapManager::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
+        if (!MapManager::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid coordinates, skip", guid, data.id);
             continue;
         }
 
-        if(data.phaseMask == 0)
+        if (data.phaseMask == 0)
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
             data.phaseMask = 1;
@@ -1611,6 +1603,7 @@ void ObjectMgr::LoadGameobjects()
 
         if (gameEvent==0 && GuidPoolId==0 && EntryPoolId==0)// if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);
+
         ++count;
 
     } while (result->NextRow());
@@ -1619,6 +1612,33 @@ void ObjectMgr::LoadGameobjects()
 
     sLog.outString();
     sLog.outString( ">> Loaded %lu gameobjects", (unsigned long)mGameObjectDataMap.size());
+}
+
+void ObjectMgr::LoadGameObjectAddon()
+{
+    sGameObjectDataAddonStorage.Load();
+
+    sLog.outString(">> Loaded %u gameobject addons", sGameObjectDataAddonStorage.RecordCount);
+    sLog.outString();
+
+    for(uint32 i = 1; i < sGameObjectDataAddonStorage.MaxEntry; ++i)
+    {
+        GameObjectDataAddon const* addon = sGameObjectDataAddonStorage.LookupEntry<GameObjectDataAddon>(i);
+        if (!addon)
+            continue;
+
+        if (!GetGODataPair(addon->guid))
+        {
+            sLog.outErrorDb("Gameobject (GUID: %u) does not exist but has a record in `gameobject_addon`",addon->guid);
+            continue;
+        }
+
+        if (!addon->path_rotation.isUnit())
+        {
+            sLog.outErrorDb("Gameobject (GUID: %u) has invalid path rotation", addon->guid);
+            const_cast<GameObjectDataAddon*>(addon)->path_rotation = QuaternionData(0.f, 0.f, 0.f, 1.f);
+        }
+    }
 }
 
 void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
@@ -3593,8 +3613,8 @@ void ObjectMgr::LoadGroups()
         "SELECT group_instance.leaderGuid, map, instance, permanent, instance.difficulty, resettime, "
         // 6
         "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
-        // 7
-        " groups.groupId "
+        // 7              8
+        " groups.groupId, instance.encountersMask "
         "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
     );
 
@@ -3643,7 +3663,7 @@ void ObjectMgr::LoadGroups()
                 diff = REGULAR_DIFFICULTY;                  // default for both difficaly types
             }
 
-            DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true);
+            DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true, true, fields[8].GetUInt32());
             group->BindToInstance(state, fields[3].GetBool(), true);
         }while( result->NextRow() );
         delete result;
@@ -4604,6 +4624,79 @@ void ObjectMgr::LoadPageTextLocales()
 
     sLog.outString();
     sLog.outString( ">> Loaded %lu PageText locale strings", (unsigned long)mPageTextLocaleMap.size() );
+}
+
+void ObjectMgr::LoadInstanceEncounters()
+{
+    m_DungeonEncounters.clear();         // need for reload case
+
+    QueryResult* result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
+    
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded 0 Instance Encounters. DB table `instance_encounters` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry(entry);
+        
+        if (!dungeonEncounter)
+        {
+            sLog.outErrorDb("Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);
+            continue;
+        }
+        
+        uint8 creditType = fields[1].GetUInt8();
+        uint32 creditEntry = fields[2].GetUInt32();
+        switch (creditType)
+        {
+            case ENCOUNTER_CREDIT_KILL_CREATURE:
+            {
+                CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creditEntry);
+                if (!cInfo)
+                {
+                    sLog.outErrorDb("Table `instance_encounters` has an invalid creature (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
+                }
+                break;
+            }
+            case ENCOUNTER_CREDIT_CAST_SPELL:
+            {
+                if (!sSpellStore.LookupEntry(creditEntry))
+                {
+                    // skip spells that aren't in dbc for now
+                    //sLog.outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
+                }
+                break;
+            }
+            default:
+                sLog.outErrorDb("Table `instance_encounters` has an invalid credit type (%u) for encounter %u (%s), skipped!", creditType, entry, dungeonEncounter->encounterName[0]);
+                continue;
+        }
+        uint32 lastEncounterDungeon = fields[3].GetUInt32();
+
+        m_DungeonEncounters.insert(DungeonEncounterMap::value_type(creditEntry, new DungeonEncounter(dungeonEncounter, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon)));
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %lu Instance Encounters", (unsigned long)m_DungeonEncounters.size() );
 }
 
 struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
@@ -7470,7 +7563,7 @@ bool PlayerCondition::Meets(Player const * player) const
             return player->GetQuestRewardStatus(value1);
         case CONDITION_QUESTTAKEN:
         {
-            return player->IsCurrentQuest(value1);
+            return player->IsCurrentQuest(value1, value2);
         }
         case CONDITION_AD_COMMISSION_AURA:
         {
@@ -7737,7 +7830,7 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 return false;
             }
 
-            if (value2)
+            if (value2 && condition != CONDITION_QUESTTAKEN)
                 sLog.outErrorDb("Quest condition (%u) has useless data in value2 (%u)!", condition, value2);
             break;
         }
