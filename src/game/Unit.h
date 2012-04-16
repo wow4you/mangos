@@ -2004,7 +2004,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool m_isCreatureLinkingTrigger;
         bool m_isSpawningLinked;
 
-    private:
+    public:
         void CleanupDeletedAuras();
         void UpdateSplineMovement(uint32 t_diff);
 
