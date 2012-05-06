@@ -715,7 +715,7 @@ void AreaAura::Update(uint32 diff)
                     continue;
 
                 bool check = true;
-                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && (*tIter)->GetTypeId() != TYPEID_PLAYER)
+                if (GetSpellProto()->HasAttribute(SPELL_ATTR_EX3_TARGET_ONLY_PLAYER) && (*tIter)->GetTypeId() != TYPEID_PLAYER)
                     check = false;
 
                 if (!check)

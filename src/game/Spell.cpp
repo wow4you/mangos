@@ -4983,7 +4983,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_LOWLEVEL;
             }
 
-            if (strict && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER)
+            if (strict && m_spellInfo->HasAttribute(SPELL_ATTR_EX3_TARGET_ONLY_PLAYER) && target->GetTypeId() != TYPEID_PLAYER)
                 return SPELL_FAILED_BAD_TARGETS;
         }
         else if (m_caster == target)
@@ -7190,7 +7190,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
             break;
     }
 
-    if (target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SCRIPT)
+    if (target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR_EX3_TARGET_ONLY_PLAYER) && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SCRIPT)
         return false;
 
     switch (m_spellInfo->Id)
