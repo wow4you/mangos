@@ -554,20 +554,9 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
                 if (name == "")
                 {
-                    // check if the original name already exists
                     name = getnth(line, 3);                 // characters.name
                     CharacterDatabase.escape_string(name);
-
-                    result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
-                    if (result)
-                    {
-                        delete result;
-
-                        if (!changenth(line, 36, "1"))      // characters.at_login set to "rename on login"
-                            ROLLBACK(DUMP_FILE_BROKEN);
-
-                        nameInvalidated = true;
-                    }
+                    nameInvalidated = true;
                 }
                 else
                 {
@@ -720,7 +709,11 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         }
 
         if (execute_ok && !CharacterDatabase.Execute(line.c_str()))
+        {
             ROLLBACK(DUMP_FILE_BROKEN);
+        }
+        else // Set rename flag
+            CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | 1 WHERE guid = '%u'", guid);
     }
 
     CharacterDatabase.CommitTransaction();
