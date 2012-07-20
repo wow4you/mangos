@@ -31,6 +31,9 @@
     <Filter Include="Movement">
       <UniqueIdentifier>{0ac140f9-89c1-4830-b673-514c5e8b4d37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MangChat">
+      <UniqueIdentifier>{10b97d47-328c-472d-bfca-20bb3b61df9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\game\AccountMgr.cpp">
@@ -514,6 +517,18 @@
     <ClCompile Include="..\..\src\game\CreatureLinkingMgr.cpp">
       <Filter>World/Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\mangchat\IRCClient.cpp">
+      <Filter>MangChat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\game\mangchat\IRCSock.cpp">
+      <Filter>MangChat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\game\mangchat\IRCHandler.cpp">
+      <Filter>MangChat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\game\mangchat\IRCMgr.cpp">
+      <Filter>MangChat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
@@ -972,6 +987,12 @@
     </ClInclude>
     <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h">
       <Filter>World/Handlers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\mangchat\IRCClient.h">
+      <Filter>MangChat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\mangchat\IRCMgr.h">
+      <Filter>MangChat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
