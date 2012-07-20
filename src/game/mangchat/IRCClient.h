@@ -28,6 +28,14 @@ enum HardcodedOptions
     WAIT_CONNECT_TIME = 30000
 };
 
+enum MangChatAuthMethods
+{
+    AUTH_NO_AUTH = 0,
+    AUTH_NICKSERV_PW = 1,
+    AUTH_NICKSERV_USER_AND_PW = 2,
+    MAX_AUTH_METHODS = 3
+};
+
 enum MangChatChannelOptions
 {
     OPTION_LINK_WITH_OTHER_CHANNEL = 1,
@@ -56,7 +64,7 @@ typedef map<string, ChannelList> ChannelLinkMap;
 class IRCClient : public ACE_Based::Runnable
 {
     public:
-        IRCClient(string sHost, int iPort, string sUser, string sPass, string sNick, ChannelLinkMap WoWChannelLinks, ChannelLinkMap IRCChannelLinks);
+        IRCClient(string sHost, int iPort, string sUser, string sPass, string sNick, ChannelLinkMap WoWChannelLinks, ChannelLinkMap IRCChannelLinks, uint8 uiAuth);
         ~IRCClient();
 
         // ZThread Entry
@@ -135,6 +143,10 @@ class IRCClient : public ACE_Based::Runnable
         /* IRC Channel : WoW Channel
          */
         ChannelLinkMap m_mIRCLinks;
+
+        /* Authenticationmethod
+         */
+        uint8 m_uiAuth;
 
         // Socket indentifier
         int SOCKET;

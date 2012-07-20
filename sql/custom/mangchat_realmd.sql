@@ -6,6 +6,7 @@ CREATE TABLE `mangchat` (
   `user` text,
   `pass` text,
   `nick` text,
+  `auth` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -49,7 +49,7 @@ void IRCMgr::Initialize()
 
     if (!pResult)
     {
-        sLog.outError("Could not load table 'mangchat_links'");
+        sLog.outErrorDb("mangChat: Could not load table 'mangchat_links'");
         return;
     }
 
@@ -78,11 +78,11 @@ void IRCMgr::Initialize()
 
     delete pResult;
 
-    pResult = LoginDatabase.PQuery("SELECT id, host, port, user, pass, nick FROM mangchat");
+    pResult = LoginDatabase.PQuery("SELECT id, host, port, user, pass, nick, auth FROM mangchat");
 
     if (!pResult)
     {
-        sLog.outError("Could not load table 'mangchat'");
+        sLog.outErrorDb("mangChat: Could not load table 'mangchat'");
         return;
     }
 
@@ -108,12 +108,20 @@ void IRCMgr::Initialize()
 
         if (!WoWChannelLinks.size() && !IRCChannelLinks.size())
         {
-            sLog.outError("No channels linked in table 'mangchat_links' for Id '%u'", uiId);
+            sLog.outErrorDb("mangChat: No channels linked in table 'mangchat_links' for Id '%u'", uiId);
+            continue;
+        }
+
+        uint8 uiAuth = pFields[6].GetUInt8();
+
+        if (uiAuth >= MAX_AUTH_METHODS)
+        {
+            sLog.outErrorDb("mangChat: Unknown auth method '%u' for Id '%u'", uiAuth, uiId);
             continue;
         }
 
         IRCClient* pClient = new IRCClient(pFields[1].GetCppString(), pFields[2].GetInt32(), pFields[3].GetCppString(), pFields[4].GetCppString(),
-            pFields[5].GetCppString(), WoWChannelLinks, IRCChannelLinks);
+            pFields[5].GetCppString(), WoWChannelLinks, IRCChannelLinks, uiAuth);
 
         m_lClients.push_back(pClient);
 

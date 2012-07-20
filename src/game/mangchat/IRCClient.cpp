@@ -21,7 +21,7 @@
 #include "../Channel.h"
 #include "../Chat.h"
 
-IRCClient::IRCClient(string sHost, int iPort, string sUser, string sPass, string sNick, ChannelLinkMap WoWChannelLinks, ChannelLinkMap IRCChannelLinks) :
+IRCClient::IRCClient(string sHost, int iPort, string sUser, string sPass, string sNick, ChannelLinkMap WoWChannelLinks, ChannelLinkMap IRCChannelLinks, uint8 uiAuth) :
 m_bActive(true),
 m_sHost(sHost),
 m_iPort(iPort),
@@ -29,7 +29,8 @@ m_sUser(sUser),
 m_sPass(sPass),
 m_sNick(sNick),
 m_mWoWLinks(WoWChannelLinks),
-m_mIRCLinks(IRCChannelLinks)
+m_mIRCLinks(IRCChannelLinks),
+m_uiAuth(uiAuth)
 {
 }
 

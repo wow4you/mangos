@@ -249,9 +249,22 @@ void IRCClient::HandleReceivedData(std::string sData)
         }
         else if (sCommand == "001")
         {
-            /* Use nickserv
+            /* Authenticate to host
              */
-            SendToIRC("PRIVMSG nickserv :IDENTIFY " + m_sPass + "\n");
+            switch (m_uiAuth)
+            {
+                case AUTH_NO_AUTH:
+                    break;
+                case AUTH_NICKSERV_PW:
+                    SendToIRC("PRIVMSG nickserv :IDENTIFY " + m_sPass + "\n");
+                    break;
+                case AUTH_NICKSERV_USER_AND_PW:
+                    SendToIRC("PRIVMSG nickserv :IDENTIFY " + m_sNick + " " + m_sPass + "\n");
+                    break;
+                default:
+                    sLog.outError("mangChat: Unknown auth method '%u' with host '%s'", m_uiAuth, m_sHost.c_str());
+                    break;
+            }
 
             /* Join all defined IRC Channels
              */
