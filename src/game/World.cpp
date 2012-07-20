@@ -66,6 +66,7 @@
 #include "AuctionHouseBot/AuctionHouseBot.h"
 #include "CharacterDatabaseCleaner.h"
 #include "CreatureLinkingMgr.h"
+#include "mangchat/IRCMgr.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -1421,6 +1422,10 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Initialize AuctionHouseBot...");
     sAuctionBot.Initialize();
+
+    // mangChat
+    sLog.outString("Initialize MangChat...");
+    sIRCMgr.Initialize();
 
     sLog.outString("WORLD: World initialized");
 

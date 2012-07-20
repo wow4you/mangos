@@ -20,6 +20,7 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "SocialMgr.h"
+#include "mangchat/IRCMgr.h"
 
 Channel::Channel(const std::string& name, uint32 channel_id)
     : m_announce(true), m_moderate(false), m_name(name), m_flags(0), m_channelId(channel_id)
@@ -109,6 +110,9 @@ void Channel::Join(ObjectGuid p, const char* pass)
     MakeYouJoined(&data);
     SendToOne(&data, p);
 
+    // mangChat
+    sIRCMgr.HandleWoWChannelAction(m_name, ACTION_JOIN_CHANNEL, plr);
+
     JoinNotify(p);
 
     // if no owner first logged will become
@@ -153,6 +157,9 @@ void Channel::Leave(ObjectGuid p, bool send)
             MakeLeft(&data, p);
             SendToAll(&data);
         }
+
+        // mangChat
+        sIRCMgr.HandleWoWChannelAction(m_name, ACTION_LEAVE_CHANNEL, plr);
 
         LeaveNotify(p);
 
