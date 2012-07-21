@@ -808,10 +808,10 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage Killed NPC");
             JustKilledCreature((Creature*)pVictim);
             // if vehicle and has passengers - remove his
-            if (cVictim->GetObjectGuid().IsVehicle())
+            if (pVictim->GetObjectGuid().IsVehicle())
             {
-                if(cVictim->GetVehicleKit())
-                    cVictim->GetVehicleKit()->RemoveAllPassengers();
+                if(pVictim->GetVehicleKit())
+                    pVictim->GetVehicleKit()->RemoveAllPassengers();
             }
 
         }
