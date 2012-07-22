@@ -20,7 +20,7 @@
 #include "Policies/SingletonImp.h"
 INSTANTIATE_SINGLETON_1(IRCMgr);
 
-extern DatabaseType LoginDatabase;
+extern DatabaseType WorldDatabase;
 
 IRCMgr::IRCMgr()
 {
@@ -45,7 +45,7 @@ void IRCMgr::Initialize()
         "**    rewrite by kid10 & wow4you     **",
         "***************************************");
 
-    QueryResult* pResult = LoginDatabase.PQuery("SELECT mangchat_id, wow_channel, wow_channel_options, irc_channel, irc_channel_options FROM mangchat_links");
+    QueryResult* pResult = WorldDatabase.PQuery("SELECT mangchat_id, wow_channel, wow_channel_options, irc_channel, irc_channel_options FROM mangchat_links");
 
     if (!pResult)
     {
@@ -78,7 +78,7 @@ void IRCMgr::Initialize()
 
     delete pResult;
 
-    pResult = LoginDatabase.PQuery("SELECT id, host, port, user, pass, nick, auth FROM mangchat");
+    pResult = WorldDatabase.PQuery("SELECT id, host, port, user, pass, nick, auth FROM mangchat");
 
     if (!pResult)
     {
