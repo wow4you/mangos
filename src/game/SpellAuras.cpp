@@ -5099,6 +5099,7 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     if (GetId() == 25771)
         misc = MECHANIC_IMMUNE_SHIELD;
 
+    Unit* caster = GetCaster();
     Unit* target = GetTarget();
 
     if (apply && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY))
@@ -5138,6 +5139,10 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     // Heroic Fury (Intercept cooldown remove)
     else if (apply && GetSpellProto()->Id == 60970 && target->GetTypeId() == TYPEID_PLAYER)
         ((Player*)target)->RemoveSpellCooldown(20252, true);
+    // Demonic Circle: Teleport
+    else if (apply && GetSpellProto()->Id == 48020 && caster->GetTypeId() == TYPEID_PLAYER)
+        if (GameObject* circle = caster->GetGameObject(48018))
+            caster->NearTeleportTo(circle->GetPositionX(), circle->GetPositionY(), circle->GetPositionZ(), circle->GetOrientation(), true);
 }
 
 void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
@@ -8210,6 +8215,33 @@ void Aura::PeriodicDummyTick()
 //                return;
             break;
         }
+        case SPELLFAMILY_WARLOCK:
+        {
+            switch (spell->Id)
+            {
+                case 48018: // Demonic Circle: Summon
+                {
+                    if (Unit* caster = GetCaster())
+                    {
+                        GameObject* circle = caster->GetGameObject(48018);
+                        SpellEntry const* teleportSpell = sSpellStore.LookupEntry(48020);
+                        float range = (teleportSpell) ? GetSpellMaxRange(sSpellRangeStore.LookupEntry(teleportSpell->rangeIndex)) : 0.0f;
+
+                        if (circle && caster->IsWithinDist(circle, range))
+                        {
+                            if (!caster->HasAura(62388))
+                                caster->CastSpell(caster, 62388, true);
+                        }
+                        else
+                            caster->RemoveAurasDueToSpell(62388);
+                    }
+
+                    break;
+                }
+            }
+
+            break;
+        }
         case SPELLFAMILY_DRUID:
         {
             switch (spell->Id)
@@ -9427,8 +9459,26 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
         }
         case SPELLFAMILY_WARLOCK:
         {
+            // Demonic Circle: Summon
+            if (m_spellProto->Id == 48018)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                if (!apply)
+                {
+                    caster->RemoveAurasDueToSpell(62388);
+
+                    if (m_removeMode != AURA_REMOVE_BY_STACK)
+                        caster->RemoveGameObject(m_spellProto->Id, true);
+                }
+                else
+                    caster->CastSpell(caster, 62388, true);
+            }
             // Fear (non stacking)
-            if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000040000000000))
+            else if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000040000000000))
             {
                 if (!apply)
                 {

@@ -2786,6 +2786,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_BREAK_PLAYER_TARGETING:
                 case SPELL_EFFECT_SUMMON_ALL_TOTEMS:
                 case SPELL_EFFECT_FEED_PET:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:
                 case SPELL_EFFECT_DESTROY_ALL_TOTEMS:
                 case SPELL_EFFECT_SKILL:
                     targetUnitMap.push_back(m_caster);
@@ -3168,6 +3169,13 @@ void Spell::cast(bool skipCheck)
                 if (Aura* aur = m_caster->GetAura(70847, EFFECT_INDEX_0))
                     if (roll_chance_i(aur->GetModifier()->m_amount))
                         AddTriggeredSpell(70849);           // Extra Charge!
+            break;
+        }
+        case SPELLFAMILY_WARLOCK:
+        {
+            if (m_spellInfo->Id == 48018) // Demonic Circle: Summon
+                if (m_caster->GetGameObject(m_spellInfo->Id))
+                    m_caster->CastSpell(m_caster, 60854, true); // Demonic Circle: Clear
             break;
         }
         case SPELLFAMILY_PRIEST:

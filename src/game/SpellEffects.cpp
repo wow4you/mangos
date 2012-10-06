@@ -9179,7 +9179,10 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     if (ObjectGuid guid = m_caster->m_ObjectSlotGuid[slot])
     {
         if (GameObject* obj = m_caster ? m_caster->GetMap()->GetGameObject(guid) : NULL)
+        {
             obj->SetLootState(GO_JUST_DEACTIVATED);
+            m_caster->RemoveGameObject(obj, true);
+        }
         m_caster->m_ObjectSlotGuid[slot].Clear();
     }
 
