@@ -348,6 +348,36 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage += uint32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12f);
                         break;
                     }
+                    // Polarity Shift Charges
+                    case 28062:                             // Positive Charge (Thaddius)
+                    case 28085:                             // Negative Charge (Thaddius)
+                    case 39090:                             // Positive Charge (Capacitus)
+                    case 39093:                             // Negative Charge (Capacitus)
+                    {
+                        uint32 uiAuraId = 0;
+                        uint32 uiBuffId = 0;
+                        switch (m_spellInfo->Id)
+                        {
+                            case 28062: uiAuraId = 28059; uiBuffId = 29659; break;
+                            case 28085: uiAuraId = 28084; uiBuffId = 29660; break;
+                            case 39090: uiAuraId = 39088; uiBuffId = 39089; break;
+                            case 39093: uiAuraId = 39091; uiBuffId = 39092; break;
+                        }
+
+                        // Do not damage non-players or players with same aura
+                        if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+                            damage = 0;
+
+                        if (unitTarget != m_caster && unitTarget->HasAura(uiAuraId))
+                        {
+                            // Buff ourself
+                            // TODO - Actually the caster should send one SPELL_START msg
+                            m_caster->CastSpell(m_caster, uiBuffId, true);
+                            // Don't deal damage
+                            damage = 0;
+                        }
+                        break;
+                    }
                     // percent max target health
                     case 29142:                             // Eyesore Blaster
                     case 35139:                             // Throw Boom's Doom
@@ -1180,6 +1210,58 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 23782, true);
                     m_caster->CastSpell(m_caster, 23783, true);
                     return;
+                case 28089:                                 // Polarity Shift (Thaddius)
+                case 39096:                                 // Polarity Shift (Mechano-Lord Capacitus)
+                {
+                    uint32 positiveDummyAura = 0;
+                    uint32 negativeDummyAura = 0;
+
+                    // First, we remove auras from previous casts, reapplying new auras on last-target
+                    if (m_spellInfo->Id == 28089)
+                    {
+                        positiveDummyAura = 28059;
+                        negativeDummyAura = 28084;
+                    }
+                    else if (m_spellInfo->Id == 39096)
+                    {
+                        positiveDummyAura = 39088;
+                        negativeDummyAura = 39091;
+                    }
+
+                    unitTarget->RemoveAurasDueToSpell(positiveDummyAura);
+                    unitTarget->RemoveAurasDueToSpell(negativeDummyAura);
+
+                    if (m_UniqueTargetInfo.rbegin()->targetGUID != unitTarget->GetObjectGuid())
+                        return;
+
+                    // Keep Track of positive Charges
+                    uint32 maxPositiveTargets = m_UniqueTargetInfo.size() / 2;
+                    uint32 positiveChargedTargets = 0;
+                    uint32 negativeChargedTargets = 0;
+                    for (std::list<TargetInfo>::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); itr++)
+                    {
+                        // Skip Non-Players
+                        if (!itr->targetGUID.IsPlayer())
+                            continue;
+
+                        // The order of the targets is not entirely random, hence add some randomness with urand(0, 1)
+                        // apply positive, by random or if we have enough negative already
+                        if (Unit* pTarget = m_caster->GetMap()->GetUnit(itr->targetGUID))
+                        {
+                            if (positiveChargedTargets < maxPositiveTargets && (urand(0, 1) || negativeChargedTargets >= maxPositiveTargets))
+                            {
+                                pTarget->CastSpell(pTarget, positiveDummyAura, true);
+                                positiveChargedTargets++;
+                            }
+                            else                            // apply negative
+                            {
+                                pTarget->CastSpell(pTarget, negativeDummyAura, true);
+                                negativeChargedTargets++;
+                            }
+                        }
+                    }
+                    return;
+                }
                 case 24930:                                 // Hallow's End Treat
                 {
                     uint32 spell_id = 0;
