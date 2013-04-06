@@ -420,6 +420,10 @@ source_group("Movement"
     movement/util.cpp
 )
 
+source_group("MangChat"
+  REGULAR_EXPRESSION mangchat/.*
+)
+
 if(PCH)
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 endif()
