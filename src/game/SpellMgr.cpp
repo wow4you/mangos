@@ -2005,6 +2005,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if ((spellInfo_1->Id == 50758 && spellInfo_2->Id == 50756) ||
                             (spellInfo_2->Id == 50758 && spellInfo_1->Id == 50756))
                         return false;
+						
+                    // Pursuing Spikes Ground Aura and Spike Auras
+                    if (spellInfo_2->Id == 65921)
+                        if (spellInfo_1->Id >= 65920 && spellInfo_1->Id <= 65923)
+                            return false;
 
                     // Arcane Beam Periodic and Arcane Beam Visual
                     if ((spellInfo_1->Id == 51019 && spellInfo_2->Id == 51024) ||
