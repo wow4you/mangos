@@ -17,7 +17,7 @@
 #include "IRCMgr.h"
 #include "Database/DatabaseEnv.h"
 
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 INSTANTIATE_SINGLETON_1(IRCMgr);
 
 extern DatabaseType WorldDatabase;
